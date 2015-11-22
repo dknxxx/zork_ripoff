@@ -115,7 +115,7 @@ angry_mob = GameObject.new do |input|
     end
   }
 end
-angry_mob.name = angry_mob
+angry_mob.name = 'angry_mob'
 angry_mob.description = 'The angriest of mobs'
 
 clown = GameObject.new do |input|
