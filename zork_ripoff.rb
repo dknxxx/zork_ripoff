@@ -61,6 +61,8 @@ def print_location_name(node)
   puts "#======== #{node.name} ========"
 end
 
+inventory = []
+
 wasteland = Node.new do |input|
   false
 end
@@ -92,13 +94,13 @@ wasteland.objects.push(statue)
 town.name = 'town'
 town.description = 'I used to be a text adventurer like you, but then I stumbled over my words in the knee.'
 
-dead_clown = GameObject.new do
+dead_clown = GameObject.new do |input|
   result = true
 
   if input =~ /take wig/
     puts 'You take the wig.'
     town.objects.delete(dead_clown)
-    # TODO add wig to inventory
+    inventory.push('clown wig')
   else
     result = false
   end
@@ -169,6 +171,13 @@ while continue do
         "To the #{direction} you see a #{node.name}"
       }.join(". ")
       puts "#{object_listing}. #{direction_listing}."
+    elsif input =~ /inventory/
+      if inventory.any?
+        items_listed = inventory.map { |item| "a #{item}" }.join(', ')
+        puts "In your inventory, you have: #{items_listed}."
+      else
+        puts "In your inventory, you have nothing."
+      end
     else
       puts "I do not understand."
     end
