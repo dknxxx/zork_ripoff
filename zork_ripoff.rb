@@ -202,7 +202,7 @@ puts current_node.description
 
 main_input_parser = InputParser.new do
   add(/quit/) { |match|
-    puts name
+    continue = false
   }
   add(/(go|move) (.*)/) { |match|
     direction = match[2].to_sym
@@ -212,7 +212,7 @@ main_input_parser = InputParser.new do
       print_location_name current_node
       puts current_node.description
     else
-      puts "There is nothing #{$2}"
+      puts "There is nothing #{direction}"
     end
   }
   add(/look( at)? (.*)/) { |match|
