@@ -1,34 +1,6 @@
+require_relative 'game_object'
+require_relative 'node'
 require_relative 'input_parser'
-
-class GameObject
-  attr_accessor :name, :description
-
-  def initialize(&input_handler)
-    @input_handler = input_handler
-  end
-
-  def process_input(input)
-    @input_handler.call(input) if @input_handler
-  end
-end
-
-class Node < GameObject
-  attr_accessor :directions, :objects
-
-  def initialize(&input_handler)
-    super(&input_handler)
-    @directions = {}
-    @objects = []
-  end
-
-  def link(other_node, direction)
-    @directions[direction] = other_node
-  end
-
-  def get(direction)
-    @directions[direction]
-  end
-end
 
 def invert_direction(direction)
   case direction
@@ -267,4 +239,3 @@ while continue do
 
   print "\n"
 end
-
