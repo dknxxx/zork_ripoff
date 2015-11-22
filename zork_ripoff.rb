@@ -155,7 +155,7 @@ clown = GameObject.new do |input|
   result
 end
 clown.name = 'clown'
-clown.description = 'a crazy clown'
+clown.description = 'a crazy clown, maybe you should approach him'
 town.objects.push(clown)
 
 link_bidrectional(wasteland, town, :east)
