@@ -1,7 +1,4 @@
-# puts "Hello. What is your name?"
-# name = gets.chomp
-
-# puts "Welcome #{name}."
+require_relative 'input_parser'
 
 class Node
   attr_accessor :name, :directions, :description, :objects
@@ -163,6 +160,61 @@ link_bidrectional(wasteland, town, :east)
 current_node = wasteland
 print_location_name current_node
 puts current_node.description
+
+main_input_parser = InputParser.new do
+  add(/quit/) { |match|
+    puts name
+  }
+  add(/(go|move) (.*)/) { |match|
+    direction = match[2].to_sym
+    puts direction
+    if current_node.get(direction)
+      current_node = current_node.get(direction)
+      print_location_name current_node
+      puts current_node.description
+    else
+      puts "There is nothing #{$2}"
+    end
+  }
+  add(/look( at)? (.*)/) { |match|
+    object = current_node.objects.find { |obj| obj.name == match[2] }
+    if object
+      puts object.description
+    else
+      puts "What is a #{object}?"
+    end
+  }
+  add(/see (.*)/) { |match|
+    object = current_node.objects.find { |obj| obj.name == match[1] }
+    if object
+      image = load_image(object.name)
+      puts image || "It looks like a #{object.name}"
+    else
+      puts "What is a #{object}?"
+    end
+  }
+  add(/look/) { |match|
+    object_listing = current_node.objects.map { |object|
+      "You see a #{object.name}"
+    }.join(". ")
+    direction_listing = current_node.directions.map { |direction, node|
+      "To the #{direction} you see a #{node.name}"
+    }.join(". ")
+    puts "#{object_listing}. #{direction_listing}."
+  }
+  add(/inventory/) { |match|
+    if inventory.any?
+      items_listed = inventory.map { |item| "a #{item}" }.join(', ')
+      puts "In your inventory, you have: #{items_listed}."
+    else
+      puts "In your inventory, you have nothing."
+    end
+  }
+  add(//) { |match|
+    puts "I do not understand"
+  }
+end
+
 while continue do
   print '>'
   input = gets.chomp.strip
@@ -175,50 +227,7 @@ while continue do
   end
 
   if not input_handled
-    if input == "quit"
-      continue = false
-    elsif input =~ /(go|move) (.*)/
-      direction = $2.to_sym
-      if current_node.get(direction)
-        current_node = current_node.get(direction)
-        print_location_name current_node
-        puts current_node.description
-      else
-        puts "There is nothing #{$2}"
-      end
-    elsif input =~ /look( at)? (.*)/
-      object = current_node.objects.find { |obj| obj.name == $2 }
-      if object
-        puts object.description
-      else
-        puts "What is a #{object}?"
-      end
-    elsif input =~ /see (.*)/
-      object = current_node.objects.find { |obj| obj.name == $1 }
-      if object
-        image = load_image(object.name)
-        puts image || "It looks like a #{object.name}"
-      else
-        puts "What is a #{object}?"
-      end
-    elsif input =~ /look/
-      object_listing = current_node.objects.map { |object|
-        "You see a #{object.name}"
-      }.join(". ")
-      direction_listing = current_node.directions.map { |direction, node|
-        "To the #{direction} you see a #{node.name}"
-      }.join(". ")
-      puts "#{object_listing}. #{direction_listing}."
-    elsif input =~ /inventory/
-      if inventory.any?
-        items_listed = inventory.map { |item| "a #{item}" }.join(', ')
-        puts "In your inventory, you have: #{items_listed}."
-      else
-        puts "In your inventory, you have nothing."
-      end
-    else
-      puts "I do not understand."
-    end
+    main_input_parser.parse input
   end
 
   print "\n"
