@@ -93,6 +93,7 @@ mayor = GameObject.new do |input|
       }
       add(/no/) {
         puts 'The mob guts you like the beast you are.'
+        continue = false
       }
     }
   }
@@ -103,8 +104,8 @@ mayor.description = 'The saltiest of the salties'
 
 angry_mob_directions_left = [:east, :west, :north, :south]
 angry_mob = GameObject.new do |input|
-  add (/(go|move) (.*)/i) { |match|
-   direction = match[2].downcase.to_sym
+  add (/(go|move) (.*)/i) {
+   direction = $2.downcase.to_sym
    angry_mob_directions_left.delete(direction)
    if angry_mob_directions_left.empty?
      puts "The mayor approaches"
@@ -114,11 +115,12 @@ angry_mob = GameObject.new do |input|
     end
   }
 end
-angry_mob.name = 'angry mob'
+angry_mob.name = angry_mob
+angry_mob.description = 'The angriest of mobs'
 
 clown = GameObject.new do |input|
-  add (/approach clown/i) {
-    ask_question('The clown tries to kill you. Hit back?') {
+  add (/approach/i) {
+    ask_question('This crazy motherfucker named Connor the Clown tries to gut you. Stab that bitch in the face?') {
       add(/yes/i) {
         puts 'You kill him.'
         town.objects.delete(clown)
@@ -126,7 +128,7 @@ clown = GameObject.new do |input|
         town.objects.push(angry_mob)
       }
       add(/no/i) {
-        puts 'You dead.'
+        puts 'You are dead.'
         continue = false
       }
     }
@@ -177,6 +179,7 @@ main_input_parser = InputParser.new do
     end
   }
   add(/look/i) { |match|
+<<<<<<< HEAD
     object_listing = case current_node.objects.size
     when 0
       ""
@@ -194,6 +197,15 @@ main_input_parser = InputParser.new do
     }.join(". ")
     
     puts "#{object_listing}#{direction_listing}."
+=======
+    object_listing = current_node.objects.map { |object|
+      "You see a #{object.name}"
+    }.join(". ")
+    direction_listing = current_node.directions.map { |direction, node|
+      "To the #{direction} you see a #{node.name}"
+    }.join(". ")
+    puts "#{object_listing}. #{direction_listing}."
+>>>>>>> 424678aa2a0ce9a69c7546e103432b8b5c35b066
   }
   add(/inventory/i) { |match|
     if inventory.any?
