@@ -103,8 +103,8 @@ mayor.description = 'The saltiest of the salties'
 
 angry_mob_directions_left = [:east, :west, :north, :south]
 angry_mob = GameObject.new do |input|
-  add (/(go|move) (.*)/i) {
-   direction = $2.downcase.to_sym
+  add (/(go|move) (.*)/i) { |match|
+   direction = match[2].downcase.to_sym
    angry_mob_directions_left.delete(direction)
    if angry_mob_directions_left.empty?
      puts "The mayor approaches"
@@ -114,6 +114,7 @@ angry_mob = GameObject.new do |input|
     end
   }
 end
+angry_mob.name = 'angry mob'
 
 clown = GameObject.new do |input|
   add (/approach clown/i) {
@@ -179,10 +180,21 @@ main_input_parser = InputParser.new do
     object_listing = current_node.objects.map { |object|
       "You see a #{object.name}"
     }.join(". ")
+    object_listing = case current_node.objects.size
+    when 0
+      ""
+    when 1
+      "You see a #{current_node.objects.first.name}. "
+    else
+      object_names = (current_node.objects[1..-2].map { |object|
+        "a #{object.name}"
+      } + ["and a #{current_node.objects[-1].name}"]).join(", ")
+      "You see a #{current_node.objects.first.name}, #{object_names}. "
+    end
     direction_listing = current_node.directions.map { |direction, node|
       "To the #{direction} you see a #{node.name}"
     }.join(". ")
-    puts "#{object_listing}. #{direction_listing}."
+    puts "#{object_listing}#{direction_listing}."
   }
   add(/inventory/i) { |match|
     if inventory.any?
