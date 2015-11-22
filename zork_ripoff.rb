@@ -21,12 +21,20 @@ class Node
   end
 
   def process_input(input)
-    @input_handler.call(input)
+    @input_handler.call(input) if @input_handler
   end
 end
 
 class GameObject
   attr_accessor :name, :description
+
+  def initialize(&input_handler)
+    @input_handler = input_handler
+  end
+
+  def process_input(input)
+    @input_handler.call(input) if @input_handler
+  end
 end
 
 def invert_direction(direction)
@@ -54,11 +62,11 @@ def print_location_name(node)
 end
 
 wasteland = Node.new do |input|
-  # puts 'bye'
+  false
 end
 
 town = Node.new do |input|
-  # puts 'hi'
+  false
 end
 
 wasteland.name = 'wasteland'
@@ -84,6 +92,39 @@ wasteland.objects.push(statue)
 town.name = 'town'
 town.description = 'I used to be a text adventurer like you, but then I stumbled over my words in the knee.'
 
+dead_clown = GameObject.new do
+  result = true
+
+  if input =~ /take wig/
+    puts 'You take the wig.'
+    town.objects.delete(dead_clown)
+    # TODO add wig to inventory
+  else
+    result = false
+  end
+
+  result
+end
+dead_clown.name = 'dead clown'
+dead_clown.description = 'you killed him. he has a bloody wig on'
+
+clown = GameObject.new do |input|
+  result = true
+
+  if input =~ /approach/
+    puts 'The clown tries to kill you. You hit back and kill it first.'
+    town.objects.delete(clown)
+    town.objects.push(dead_clown)
+  else
+    result = false
+  end
+
+  result
+end
+clown.name = 'clown'
+clown.description = 'a crazy clown'
+town.objects.push(clown)
+
 link_bidrectional(wasteland, town, :east)
 
 current_node = wasteland
@@ -91,33 +132,47 @@ continue = true
 print_location_name current_node
 puts current_node.description
 while continue do
+  print '>'
   input = gets.chomp
-  current_node.process_input(input)
-  if input == "quit"
-    continue = false
-  elsif input =~ /(go|move) (.*)/
-    direction = $2.to_sym
-    if current_node.get(direction)
-      current_node = current_node.get(direction)
-      print_location_name current_node
-      puts current_node.description
-    else
-      puts "There is nothing #{$2}"
-    end
-  elsif input =~ /look (.*)/
-    object = current_node.objects.find { |obj| obj.name == $1 }
-    if object
-      puts object.description
-    else
-      puts "What is a #{object}?"
-    end
-  elsif input =~ /look/
-    object_listing = current_node.objects.map { |object|
-      object.name
-    }.join("\n")
-    direction_listing = current_node.directions.map { |direction, node|
-      "To the #{direction} you see: #{node.name}"
-    }.join("\n")
-    puts "You look around.\n\n#{object_listing}\n\n#{direction_listing}"
+  input_handled = current_node.process_input(input)
+
+  i = 0
+  while not input_handled and i < current_node.objects.length do
+    input_handled = current_node.objects[i].process_input(input)
+    i += 1
   end
+
+  if not input_handled
+    if input == "quit"
+      continue = false
+    elsif input =~ /(go|move) (.*)/
+      direction = $2.to_sym
+      if current_node.get(direction)
+        current_node = current_node.get(direction)
+        print_location_name current_node
+        puts current_node.description
+      else
+        puts "There is nothing #{$2}"
+      end
+    elsif input =~ /look (.*)/
+      object = current_node.objects.find { |obj| obj.name == $1 }
+      if object
+        puts object.description
+      else
+        puts "What is a #{object}?"
+      end
+    elsif input =~ /look/
+      object_listing = current_node.objects.map { |object|
+        "You see a #{object.name}"
+      }.join(". ")
+      direction_listing = current_node.directions.map { |direction, node|
+        "To the #{direction} you see a #{node.name}"
+      }.join(". ")
+      puts "#{object_listing}. #{direction_listing}."
+    else
+      puts "I do not understand."
+    end
+  end
+
+  print "\n"
 end
