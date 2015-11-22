@@ -4,10 +4,11 @@
 # puts "Welcome #{name}."
 
 class Node
-  attr_accessor :name, :directions, :description
+  attr_accessor :name, :directions, :description, :objects
 
   def initialize(&input_handler)
     @directions = {}
+    @objects = []
     @input_handler = input_handler
   end
 
@@ -22,6 +23,10 @@ class Node
   def process_input(input)
     @input_handler.call(input)
   end
+end
+
+class GameObject
+  attr_accessor :name, :description
 end
 
 def invert_direction(direction)
@@ -48,7 +53,7 @@ def print_location_name(node)
   puts "#======== #{node.name} ========"
 end
 
-start = Node.new do |input|
+wasteland = Node.new do |input|
   # puts 'bye'
 end
 
@@ -56,15 +61,32 @@ town = Node.new do |input|
   # puts 'hi'
 end
 
-start.name = 'start'
-start.description = 'and so it begins'
+wasteland.name = 'wasteland'
+wasteland.description = 'and so it begins'
+
+statue = GameObject.new
+statue.name = 'statue'
+statue.description = %q=Two vast and trunkless legs of stone
+Stand in the desert. Near them, on the sand,
+Half sunk, a shattered visage lies, whose frown,
+And wrinkled lip, and sneer of cold command,
+Tell that its sculptor well those passions read
+Which yet survive, stamped on these lifeless things,
+The hand that mocked them and the heart that fed:
+And on the pedestal these words appear:
+'My name is Ozymandias, king of kings:
+Look on my works, ye Mighty, and despair!'
+Nothing beside remains. Round the decay
+Of that colossal wreck, boundless and bare
+The lone and level sands stretch far away.=
+wasteland.objects.push(statue)
 
 town.name = 'town'
 town.description = 'I used to be a text adventurer like you, but then I stumbled over my words in the knee.'
 
-link_bidrectional(start, town, :east)
+link_bidrectional(wasteland, town, :east)
 
-current_node = start
+current_node = wasteland
 continue = true
 print_location_name current_node
 puts current_node.description
@@ -82,12 +104,20 @@ while continue do
     else
       puts "There is nothing #{$2}"
     end
-  elsif input =~ /where/
-    puts current_node.name
+  elsif input =~ /look (.*)/
+    object = current_node.objects.find { |obj| obj.name == $1 }
+    if object
+      puts object.description
+    else
+      puts "What is a #{object}?"
+    end
   elsif input =~ /look/
-    direction_listing = current_node.directions.map { |direction, node|
-      "#{direction}: #{node.name}"
+    object_listing = current_node.objects.map { |object|
+      object.name
     }.join("\n")
-    puts "You look around.\n\n#{direction_listing}"
+    direction_listing = current_node.directions.map { |direction, node|
+      "To the #{direction} you see: #{node.name}"
+    }.join("\n")
+    puts "You look around.\n\n#{object_listing}\n\n#{direction_listing}"
   end
 end
