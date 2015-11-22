@@ -61,6 +61,11 @@ def print_location_name(node)
   puts "#======== #{node.name} ========"
 end
 
+def load_image  (image_name)
+  path = "images/#{image_name}.txt"
+  File.open(path, 'rb') { |f| f.read } if File.exists? path
+end
+
 inventory = []
 
 wasteland = Node.new do |input|
@@ -160,6 +165,14 @@ while continue do
       object = current_node.objects.find { |obj| obj.name == $1 }
       if object
         puts object.description
+      else
+        puts "What is a #{object}?"
+      end
+    elsif input =~ /see (.*)/
+      object = current_node.objects.find { |obj| obj.name == $1 }
+      if object
+        image = load_image(object.name)
+        puts image || "It looks like a #{object.name}"
       else
         puts "What is a #{object}?"
       end
