@@ -1,8 +1,8 @@
 class Node < GameObject
   attr_accessor :directions, :objects
 
-  def initialize(&input_handler)
-    super(&input_handler)
+  def initialize(&block)
+    super(&block)
     @directions = {}
     @objects = []
   end

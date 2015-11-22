@@ -1,11 +1,11 @@
 class GameObject
   attr_accessor :name, :description
 
-  def initialize(&input_handler)
-    @input_handler = input_handler
+  def initialize(&block)
+    @input_parser = InputParser.new &block if block
   end
 
   def process_input(input)
-    @input_handler.call(input) if @input_handler
+    @input_parser.parse(input) if @input_parser
   end
 end

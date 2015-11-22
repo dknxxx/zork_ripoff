@@ -89,31 +89,27 @@ town.name = 'Former Salt Lake City'
 town.description = 'I used to be a text adventurer like you, but then I stumbled over my words in the knee.'
 
 dead_clown = GameObject.new do |input|
-  InputParser.new {
-    add(/take wig/) {
-      puts 'You take the wig.'
-      town.objects.delete(dead_clown)
-      inventory.push('clown wig')
-    }
-  }.parse input
+  add(/take wig/) {
+    puts 'You take the wig.'
+    town.objects.delete(dead_clown)
+    inventory.push('clown wig')
+  }
 end
 dead_clown.name = 'dead clown'
 dead_clown.description = 'You killed him. He has a bloody wig on'
 
 mayor = GameObject.new do |input|
-  Inputparser.new {
-    add (/talk|speak/) {
-      answer = ask_question('''Alas, my brother is dead. A new grain of salt has been added to the pile.
-      You, foreigner, are responsible and must pay the price. Submit?''', ['Yes', 'No'])
-      if answer == 'Yes'
-        puts 'You are taken to jail'
-        current_node = jail_cell
-        print_location_name current_node
-      elsif answer == 'No'
-        puts 'The mob guts you like the beast you are.'
-      end
-    }
-  }.parse input
+  add (/talk|speak/) {
+    answer = ask_question('''Alas, my brother is dead. A new grain of salt has been added to the pile.
+    You, foreigner, are responsible and must pay the price. Submit?''', ['Yes', 'No'])
+    if answer == 'Yes'
+      puts 'You are taken to jail'
+      current_node = jail_cell
+      print_location_name current_node
+    elsif answer == 'No'
+      puts 'The mob guts you like the beast you are.'
+    end
+  }
 end
 mayor.name = 'Cameron the Salty'
 mayor.description = 'The saltiest of the salties'
@@ -121,34 +117,31 @@ mayor.description = 'The saltiest of the salties'
 
 angry_mob_directions_left = [:east, :west, :north, :south]
 angry_mob = GameObject.new do |input|
-  InputParser.new {
-    add (/(go|move) (.*)/) {
-       direction = $2.to_sym
-       angry_mob_directions_left.delete(direction)
-       if angry_mob_directions_left.empty?
-         puts "The mayor approaches"
-         town.objects.push(mayor)
-       else
-         puts "The angry mob prevents you from leaving"
-        end
-    }
-  }.parse input
+  add (/(go|move) (.*)/) {
+   direction = $2.to_sym
+   angry_mob_directions_left.delete(direction)
+   if angry_mob_directions_left.empty?
+     puts "The mayor approaches"
+     town.objects.push(mayor)
+   else
+     puts "The angry mob prevents you from leaving"
+    end
+  }
 end
 
 clown = GameObject.new do |input|
-  InputParser.new {
-    add (/approach/) {
-      answer = ask_question('The clown tries to kill you. Hit back?', ['Yes', 'No'])
-      if answer == 'Yes'
-        puts 'You kill him.'
-        town.objects.delete(clown)
-        town.objects.push(dead_clown)
-        town.objects.push(angry_mob)
-      elsif answer == 'No'
-        puts 'You dead.'
-      end
-    }
-  }.parse input  
+  add (/approach/) {
+    answer = ask_question('The clown tries to kill you. Hit back?', ['Yes', 'No'])
+    if answer == 'Yes'
+      puts 'You kill him.'
+      town.objects.delete(clown)
+      town.objects.push(dead_clown)
+      town.objects.push(angry_mob)
+    elsif answer == 'No'
+      puts 'You dead.'
+      continue = false
+    end
+  }
 end
 
 clown.name = 'clown'
