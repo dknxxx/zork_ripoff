@@ -177,9 +177,6 @@ main_input_parser = InputParser.new do
     end
   }
   add(/look/i) { |match|
-    object_listing = current_node.objects.map { |object|
-      "You see a #{object.name}"
-    }.join(". ")
     object_listing = case current_node.objects.size
     when 0
       ""
@@ -191,9 +188,11 @@ main_input_parser = InputParser.new do
       } + ["and a #{current_node.objects[-1].name}"]).join(", ")
       "You see a #{current_node.objects.first.name}, #{object_names}. "
     end
+
     direction_listing = current_node.directions.map { |direction, node|
       "To the #{direction} you see a #{node.name}"
     }.join(". ")
+    
     puts "#{object_listing}#{direction_listing}."
   }
   add(/inventory/i) { |match|
