@@ -85,17 +85,13 @@ town.name = 'Former Salt Lake City'
 town.description = 'I used to be a text adventurer like you, but then I stumbled over my words in the knee.'
 
 dead_clown = GameObject.new do |input|
-  result = true
-
-  if input =~ /take wig/
-    puts 'You take the wig.'
-    town.objects.delete(dead_clown)
-    inventory.push('clown wig')
-  else
-    result = false
+  InputParser.new do
+    add(/take wig/) {
+      puts 'You take the wig.'
+      town.objects.delete(dead_clown)
+      inventory.push('clown wig')
+    }
   end
-
-  result
 end
 dead_clown.name = 'dead clown'
 dead_clown.description = 'You killed him. He has a bloody wig on'
