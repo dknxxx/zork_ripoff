@@ -1,4 +1,6 @@
 class InputParser
+  attr_accessor :patterns
+
   def initialize(&block)
     @patterns = []
     @self_before_instance_eval = eval "self", block.binding

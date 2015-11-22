@@ -31,22 +31,15 @@ def load_image(image_name)
   File.open(path, 'rb') { |f| f.read } if File.exists? path
 end
 
-def ask_question(question, answers)
-  answer = nil
+def ask_question(question, &block)
+  answer_parser = InputParser.new &block
   loop do
     puts question
-    puts answers.join("\n")
-
+    puts answer_parser.patterns.map(&:first).map(&:source).map(&:capitalize).join("\n")
     print '>'
     answer = gets.chomp.strip
-
-    if answers.map { |a| a.downcase }.include?(answer.downcase)
-      answer = answers[answers.find_index { |a| a.downcase == answer.downcase }]
-      break
-    end
-    break if answers.map { |a| a.downcase }.include?(answer.downcase)
+    break if answer_parser.parse answer
   end
-  answer
 end
 
 inventory = []
@@ -80,7 +73,7 @@ town.name = 'Former Salt Lake City'
 town.description = 'I used to be a text adventurer like you, but then I stumbled over my words in the knee.'
 
 dead_clown = GameObject.new do |input|
-  add(/take wig/) {
+  add(/take wig/i) {
     puts 'You take the wig.'
     town.objects.delete(dead_clown)
     inventory.push('clown wig')
@@ -90,16 +83,18 @@ dead_clown.name = 'dead clown'
 dead_clown.description = 'You killed him. He has a bloody wig on'
 
 mayor = GameObject.new do |input|
-  add (/talk|speak/) {
-    answer = ask_question('''Alas, my brother is dead. A new grain of salt has been added to the pile.
-    You, foreigner, are responsible and must pay the price. Submit?''', ['Yes', 'No'])
-    if answer == 'Yes'
-      puts 'You are taken to jail'
-      current_node = jail_cell
-      print_location_name current_node
-    elsif answer == 'No'
-      puts 'The mob guts you like the beast you are.'
-    end
+  add (/talk|speak/i) {
+    ask_question('''Alas, my brother is dead. A new grain of salt has been added to the pile.
+    You, foreigner, are responsible and must pay the price. Submit?''') {
+      add(/yes/) {
+        puts 'You are taken to jail'
+        current_node = jail_cell
+        print_location_name current_node
+      }
+      add(/no/) {
+        puts 'The mob guts you like the beast you are.'
+      }
+    }
   }
 end
 mayor.name = 'Cameron the Salty'
@@ -108,8 +103,8 @@ mayor.description = 'The saltiest of the salties'
 
 angry_mob_directions_left = [:east, :west, :north, :south]
 angry_mob = GameObject.new do |input|
-  add (/(go|move) (.*)/) {
-   direction = $2.to_sym
+  add (/(go|move) (.*)/i) {
+   direction = $2.downcase.to_sym
    angry_mob_directions_left.delete(direction)
    if angry_mob_directions_left.empty?
      puts "The mayor approaches"
@@ -121,17 +116,19 @@ angry_mob = GameObject.new do |input|
 end
 
 clown = GameObject.new do |input|
-  add (/approach/) {
-    answer = ask_question('The clown tries to kill you. Hit back?', ['Yes', 'No'])
-    if answer == 'Yes'
-      puts 'You kill him.'
-      town.objects.delete(clown)
-      town.objects.push(dead_clown)
-      town.objects.push(angry_mob)
-    elsif answer == 'No'
-      puts 'You dead.'
-      continue = false
-    end
+  add (/approach/i) {
+    ask_question('The clown tries to kill you. Hit back?') {
+      add(/yes/i) {
+        puts 'You kill him.'
+        town.objects.delete(clown)
+        town.objects.push(dead_clown)
+        town.objects.push(angry_mob)
+      }
+      add(/no/i) {
+        puts 'You dead.'
+        continue = false
+      }
+    }
   }
 end
 
@@ -147,10 +144,10 @@ print_location_name current_node
 puts current_node.description
 
 main_input_parser = InputParser.new do
-  add(/quit/) { |match|
+  add(/quit/i) { |match|
     continue = false
   }
-  add(/(go|move) (.*)/) { |match|
+  add(/(go|move) (.*)/i) { |match|
     direction = match[2].to_sym
     puts direction
     if current_node.get(direction)
@@ -161,7 +158,7 @@ main_input_parser = InputParser.new do
       puts "There is nothing #{direction}"
     end
   }
-  add(/look( at)? (.*)/) { |match|
+  add(/look( at)? (.*)/i) { |match|
     object = current_node.objects.find { |obj| obj.name == match[2] }
     if object
       puts object.description
@@ -169,7 +166,7 @@ main_input_parser = InputParser.new do
       puts "What is a #{object}?"
     end
   }
-  add(/see (.*)/) { |match|
+  add(/see (.*)/i) { |match|
     object = current_node.objects.find { |obj| obj.name == match[1] }
     if object
       image = load_image(object.name)
@@ -178,7 +175,7 @@ main_input_parser = InputParser.new do
       puts "What is a #{object}?"
     end
   }
-  add(/look/) { |match|
+  add(/look/i) { |match|
     object_listing = current_node.objects.map { |object|
       "You see a #{object.name}"
     }.join(". ")
@@ -187,7 +184,7 @@ main_input_parser = InputParser.new do
     }.join(". ")
     puts "#{object_listing}. #{direction_listing}."
   }
-  add(/inventory/) { |match|
+  add(/inventory/i) { |match|
     if inventory.any?
       items_listed = inventory.map { |item| "a #{item}" }.join(', ')
       puts "In your inventory, you have: #{items_listed}."
