@@ -165,7 +165,7 @@ print_location_name current_node
 puts current_node.description
 while continue do
   print '>'
-  input = gets.chomp
+  input = gets.chomp.strip
   input_handled = current_node.process_input(input)
 
   i = 0
@@ -186,8 +186,8 @@ while continue do
       else
         puts "There is nothing #{$2}"
       end
-    elsif input =~ /look (.*)/
-      object = current_node.objects.find { |obj| obj.name == $1 }
+    elsif input =~ /look( at)? (.*)/
+      object = current_node.objects.find { |obj| obj.name == $2 }
       if object
         puts object.description
       else
