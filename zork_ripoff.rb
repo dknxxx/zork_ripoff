@@ -116,7 +116,7 @@ angry_mob = GameObject.new do |input|
 end
 
 clown = GameObject.new do |input|
-  add (/approach/i) {
+  add (/approach clown/i) {
     ask_question('The clown tries to kill you. Hit back?') {
       add(/yes/i) {
         puts 'You kill him.'
