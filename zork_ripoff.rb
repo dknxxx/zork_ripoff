@@ -104,8 +104,8 @@ mayor.description = 'The saltiest of the salties'
 
 angry_mob_directions_left = [:east, :west, :north, :south]
 angry_mob = GameObject.new do |input|
-  add (/(go|move) (.*)/i) {
-   direction = $2.downcase.to_sym
+  add (/(go|move) (.*)/i) { |match|
+   direction = match[2].downcase.to_sym
    angry_mob_directions_left.delete(direction)
    if angry_mob_directions_left.empty?
      puts "The mayor approaches"
@@ -115,7 +115,7 @@ angry_mob = GameObject.new do |input|
     end
   }
 end
-angry_mob.name = 'angry_mob'
+angry_mob.name = 'angry mob'
 angry_mob.description = 'The angriest of mobs'
 
 clown = GameObject.new do |input|
@@ -138,6 +138,8 @@ end
 clown.name = 'clown'
 clown.description = 'a crazy clown, maybe you should approach him'
 town.objects.push(clown)
+
+jail.name = 'Your Private Cell'
 
 
 link_bidrectional(wasteland, town, :east)
