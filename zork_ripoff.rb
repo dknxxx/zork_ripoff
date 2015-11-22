@@ -93,6 +93,7 @@ mayor = GameObject.new do |input|
       }
       add(/no/) {
         puts 'The mob guts you like the beast you are.'
+        continue = false
       }
     }
   }
@@ -114,10 +115,12 @@ angry_mob = GameObject.new do |input|
     end
   }
 end
+angry_mob.name = angry_mob
+angry_mob.description = 'The angriest of mobs'
 
 clown = GameObject.new do |input|
   add (/approach/i) {
-    ask_question('The clown tries to kill you. Hit back?') {
+    ask_question('This crazy motherfucker named Connor the Clown tries to gut you. Stab that bitch in the face?') {
       add(/yes/i) {
         puts 'You kill him.'
         town.objects.delete(clown)
@@ -125,7 +128,7 @@ clown = GameObject.new do |input|
         town.objects.push(angry_mob)
       }
       add(/no/i) {
-        puts 'You dead.'
+        puts 'You are dead.'
         continue = false
       }
     }
