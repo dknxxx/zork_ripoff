@@ -1,27 +1,5 @@
 require_relative 'input_parser'
 
-class Node
-  attr_accessor :name, :directions, :description, :objects
-
-  def initialize(&input_handler)
-    @directions = {}
-    @objects = []
-    @input_handler = input_handler
-  end
-
-  def link(other_node, direction)
-    @directions[direction] = other_node
-  end
-
-  def get(direction)
-    @directions[direction]
-  end
-
-  def process_input(input)
-    @input_handler.call(input) if @input_handler
-  end
-end
-
 class GameObject
   attr_accessor :name, :description
 
@@ -31,6 +9,24 @@ class GameObject
 
   def process_input(input)
     @input_handler.call(input) if @input_handler
+  end
+end
+
+class Node < GameObject
+  attr_accessor :directions, :objects
+
+  def initialize(&input_handler)
+    super(&input_handler)
+    @directions = {}
+    @objects = []
+  end
+
+  def link(other_node, direction)
+    @directions[direction] = other_node
+  end
+
+  def get(direction)
+    @directions[direction]
   end
 end
 
