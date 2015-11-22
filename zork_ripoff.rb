@@ -122,15 +122,15 @@ mayor.description = 'The saltiest of the salties'
 angry_mob_directions_left = [:east, :west, :north, :south]
 angry_mob = GameObject.new do |input|
   InputParser.new {
-    add (/(go|move) (.*)/) {
-       direction = $2.to_sym
-       angry_mob_directions_left.delete(direction)
-       if angry_mob_directions_left.empty?
-         puts "The mayor approaches"
-         town.objects.push(mayor)
-       else
-         puts "The angry mob prevents you from leaving"
-        end
+    add (/(go|move) (.*)/) { |match|
+     direction = match[2].to_sym
+     angry_mob_directions_left.delete(direction)
+     if angry_mob_directions_left.empty?
+       puts "The mayor approaches"
+       town.objects.push(mayor)
+     else
+       puts "The angry mob prevents you from leaving"
+      end
     }
   }.parse input
 end
