@@ -38,7 +38,7 @@ def ask_question(question, answers)
     puts answers.join("\n")
 
     print '>'
-    answer = gets.chomp
+    answer = gets.chomp.strip
 
     if answers.map { |a| a.downcase }.include?(answer.downcase)
       answer = answers[answers.find_index { |a| a.downcase == answer.downcase }]
@@ -50,20 +50,11 @@ def ask_question(question, answers)
 end
 
 inventory = []
-
-wasteland = Node.new do |input|
-  false
-end
-
-town = Node.new do |input|
-  false
-end
-
-jail_cell = Node.new do |input|
-  false
-end
-
 continue = true
+
+wasteland = Node.new
+town = Node.new
+jail_cell = Node.new
 
 wasteland.name = 'wasteland'
 wasteland.description = 'and so it begins'
@@ -220,9 +211,7 @@ while continue do
     i += 1
   end
 
-  if not input_handled
-    main_input_parser.parse input
-  end
+  main_input_parser.parse input if not input_handled
 
   print "\n"
 end
