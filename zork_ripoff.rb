@@ -61,9 +61,23 @@ def print_location_name(node)
   puts "#======== #{node.name} ========"
 end
 
-def load_image  (image_name)
+def load_image(image_name)
   path = "images/#{image_name}.txt"
   File.open(path, 'rb') { |f| f.read } if File.exists? path
+end
+
+def ask_question(question, answers)
+  answer = nil
+  loop do
+    puts question
+    puts answers.join("\n")
+
+    print '>'
+    answer = gets.chomp
+
+    break if answers.include?(answer)
+  end
+  answer
 end
 
 inventory = []
@@ -75,6 +89,8 @@ end
 town = Node.new do |input|
   false
 end
+
+continue = true
 
 wasteland.name = 'wasteland'
 wasteland.description = 'and so it begins'
@@ -119,9 +135,15 @@ clown = GameObject.new do |input|
   result = true
 
   if input =~ /approach/
-    puts 'The clown tries to kill you. You hit back and kill it first.'
-    town.objects.delete(clown)
-    town.objects.push(dead_clown)
+    answer = ask_question('The clown tries to kill you. Hit back?', ['Yes', 'No'])
+    if answer == 'Yes'
+      puts 'You kill him.'
+      town.objects.delete(clown)
+      town.objects.push(dead_clown)
+    elsif answer == 'No'
+      puts 'You dead.'
+      continue = false
+    end
   else
     result = false
   end
@@ -135,7 +157,6 @@ town.objects.push(clown)
 link_bidrectional(wasteland, town, :east)
 
 current_node = wasteland
-continue = true
 print_location_name current_node
 puts current_node.description
 while continue do
