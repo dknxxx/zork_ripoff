@@ -101,7 +101,7 @@ dead_clown.name = 'dead clown'
 dead_clown.description = 'You killed him. He has a bloody wig on'
 
 mayor = GameObject.new do |input|
-  Inputparser.new {
+  InputParser.new {
     add (/talk|speak/) {
       answer = ask_question('''Alas, my brother is dead. A new grain of salt has been added to the pile.
       You, foreigner, are responsible and must pay the price. Submit?''', ['Yes', 'No'])
