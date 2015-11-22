@@ -75,7 +75,11 @@ def ask_question(question, answers)
     print '>'
     answer = gets.chomp
 
-    break if answers.include?(answer)
+    if answers.map { |a| a.downcase }.include?(answer.downcase)
+      answer = answers[answers.find_index { |a| a.downcase == answer.downcase }]
+      break
+    end
+    break if answers.map { |a| a.downcase }.include?(answer.downcase)
   end
   answer
 end
