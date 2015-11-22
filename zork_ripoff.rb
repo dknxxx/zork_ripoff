@@ -98,7 +98,8 @@ dead_clown.description = 'You killed him. He has a bloody wig on'
 
 mayor = GameObject.new do |input|
   if input =~ /talk|speak/
-    answer = ask_question('Alas, my brother is dead. A new grain of salt has been added to the pile. You, foreigner, are responsible and must pay the price. Submit?', ['Yes, No'])
+    answer = ask_question('''Alas, my brother is dead. A new grain of salt has been added to the pile.
+      You, foreigner, are responsible and must pay the price. Submit?''', ['Yes', 'No'])
     if answer == 'Yes'
       puts 'You are taken to jail'
       current_node = jail_cell
@@ -119,6 +120,8 @@ mayor.description = 'The saltiest of the salties'
 
 angry_mob_directions_left = [:east, :west, :north, :south]
 angry_mob = GameObject.new do |input|
+  result = true
+
   if input =~ /(go|move) (.*)/
     direction = $2.to_sym
     angry_mob_directions_left.delete(direction)
@@ -128,9 +131,11 @@ angry_mob = GameObject.new do |input|
     else
       puts "The angry mob prevents you from leaving"
     end
+  else
+    result = false
   end
 
-  true
+  result
 end
 
 clown = GameObject.new do |input|
