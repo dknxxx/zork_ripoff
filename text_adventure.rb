@@ -59,7 +59,7 @@ class TextAdventure
         end
       }
       add(/look( at)? (.*)/i) { |match|
-        object = current_node.objects.find { |obj| obj.name.downcase == match[2].downcase }
+        object = current_node.active_objects.find { |obj| obj.name.downcase == match[2].downcase }
         if object
           puts object.description
         else
@@ -67,7 +67,7 @@ class TextAdventure
         end
       }
       add(/see (.*)/i) { |match|
-        object = current_node.objects.find { |obj| obj.name.downcase == match[1].downcase }
+        object = current_node.active_objects.find { |obj| obj.name.downcase == match[1].downcase }
         if object
           puts load_image(object.name) || "It looks like a #{object.name}"
         else
@@ -75,16 +75,16 @@ class TextAdventure
         end
       }
       add(/look/i) { |match|
-        object_listing = case current_node.objects.size
+        object_listing = case current_node.active_objects.size
         when 0
           "You see nothing. "
         when 1
-          "You see a #{current_node.objects.first.name}. "
+          "You see a #{current_node.active_objects.first.name}. "
         else
-          object_names = (current_node.objects[1..-2].map { |object|
+          object_names = (current_node.active_objects[1..-2].map { |object|
             "a #{object.name}"
-          } + ["and a #{current_node.objects[-1].name}"]).join(", ")
-          "You see a #{current_node.objects.first.name}, #{object_names}. "
+          } + ["and a #{current_node.active_objects[-1].name}"]).join(", ")
+          "You see a #{current_node.active_objects.first.name}, #{object_names}. "
         end
 
         direction_listing = current_node.directions.map { |direction, node|
@@ -112,8 +112,8 @@ class TextAdventure
       input_handled = current_node.process_input(input)
 
       i = 0
-      while not input_handled and i < current_node.objects.length do
-        input_handled = current_node.objects[i].process_input(input)
+      while not input_handled and i < current_node.active_objects.length do
+        input_handled = current_node.active_objects[i].process_input(input)
         i += 1
       end
 

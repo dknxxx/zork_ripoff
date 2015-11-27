@@ -1,7 +1,8 @@
 class GameObject
-  attr_accessor :name, :description
+  attr_accessor :name, :description, :active
 
   def initialize(&block)
+    @active = true
     @input_parser = InputParser.new &block if block
   end
 

@@ -7,6 +7,10 @@ class Node < GameObject
     @objects = []
   end
 
+  def active_objects
+    @objects.map(&:active)
+  end
+
   def link(other_node, direction)
     @directions[direction] = other_node
   end

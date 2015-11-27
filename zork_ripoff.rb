@@ -37,15 +37,24 @@ game = TextAdventure.new do
   The lone and level sands stretch far away.=
   wasteland.objects.push(statue)
 
-  dead_clown = GameObject.new do |input|
-    add(/take wig/i) {
-      puts 'You take the wig.'
-      town.objects.delete(dead_clown)
-      inventory.push('clown wig')
-    }
-  end
+  dead_clown = GameObject.new
+  dead_clown.active = false
   dead_clown.name = 'dead clown'
   dead_clown.description = 'You killed him. He has a bloody wig on'
+  town.objects.push(dead_clown)
+
+  wig = GameObject.new do |input|
+    add(/take wig/i) {
+      puts 'You take the wig.'
+      dead_clown.active = false
+      wig.active = false
+      inventory.push(wig.name)
+    }
+  end
+  wig.active = false
+  wig.name = 'wig'
+  wig.description = 'a bloody wig'
+  town.objects.push(wig)
 
   mayor = GameObject.new do |input|
     add (/(talk|speak) (mayor|Cameron the Salty)/i) {
@@ -62,8 +71,10 @@ game = TextAdventure.new do
       }
     }
   end
+  mayor.active = false
   mayor.name = 'Cameron the Salty'
   mayor.description = 'The saltiest of the salties'
+  town.objects.push(mayor)
 
   angry_mob_directions_left = [:east, :west, :north, :south]
   angry_mob = GameObject.new do |input|
@@ -72,23 +83,25 @@ game = TextAdventure.new do
      angry_mob_directions_left.delete(direction)
      if angry_mob_directions_left.empty?
        puts "The mayor approaches"
-       town.objects.push(mayor)
+       mayor.active = true
      else
        puts "The angry mob prevents you from leaving"
       end
     }
   end
+  angry_mob.active = false
   angry_mob.name = 'angry mob'
   angry_mob.description = 'The angriest of mobs'
+  town.objects.push(angry_mob)
 
   clown = GameObject.new do |input|
     add (/approach/i) {
       ask_question('This crazy motherfucker named Connor the Clown tries to gut you. Stab that bitch in the face?') {
         add(/yes/i) {
           puts 'You kill him.'
-          town.objects.delete(clown)
-          town.objects.push(dead_clown)
-          town.objects.push(angry_mob)
+          clown.active = false
+          dead_clown.active = true
+          angry_mob.active = true
         }
         add(/no/i) {
           puts 'You are dead.'
