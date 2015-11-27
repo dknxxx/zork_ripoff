@@ -1,5 +1,5 @@
-class Node < GameObject
-  attr_accessor :directions, :objects
+class Node
+  attr_accessor :parser, :name, :description, :directions, :objects
 
   def initialize
     @directions = {}
@@ -16,5 +16,9 @@ class Node < GameObject
 
   def get(direction)
     @directions[direction]
+  end
+
+  def process_input(input)
+    @parser.parse(input) if @parser
   end
 end
