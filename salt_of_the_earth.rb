@@ -22,6 +22,7 @@ game = TextAdventure.new do
 
   statue = GameObject.new
   statue.name = 'statue'
+  statue.overview = 'A ruined statue lays before you.'
   statue.description = %q=  Two vast and trunkless legs of stone
   Stand in the desert. Near them, on the sand,
   Half sunk, a shattered visage lies, whose frown,
@@ -40,7 +41,8 @@ game = TextAdventure.new do
   dead_clown = GameObject.new
   dead_clown.active = false
   dead_clown.name = 'dead clown'
-  dead_clown.description = 'You killed him. He has a bloody wig on'
+  dead_clown.overview = "The clown's corpse lays in the street."
+  dead_clown.description = 'You killed him. He has a bloody wig on.'
   town.objects.push(dead_clown)
 
   wig = GameObject.new
@@ -69,7 +71,8 @@ game = TextAdventure.new do
     }
   }
   mayor.active = false
-  mayor.name = 'Cameron the Salty'
+  mayor.name = 'mayor'
+  mayor.overview = 'The mayor, Cameron the Salty, leads the mob.'
   mayor.description = 'The saltiest of the salties'
   town.objects.push(mayor)
 

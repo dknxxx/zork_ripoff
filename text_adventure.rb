@@ -92,23 +92,14 @@ class TextAdventure
       # TODO drop object
       add(/look/i) { |match|
         scenery_objects = current_node.active_objects.select(&:scenery)
-        object_listing = case scenery_objects.size
-        when 0
-          "You see nothing. "
-        when 1
-          "You see a #{scenery_objects.first.name}. "
-        else
-          object_names = (scenery_objects[1..-2].map { |object|
-            "a #{object.name}"
-          } + ["and a #{scenery_objects[-1].name}"]).join(", ")
-          "You see a #{scenery_objects.first.name}, #{object_names}. "
-        end
+        object_listing = scenery_objects.map(&:overview).join("\n")
 
         direction_listing = current_node.directions.map { |direction, node|
           "To the #{direction} you see a #{node.name}"
         }.join(". ")
         
-        puts "#{object_listing}#{direction_listing}"
+        puts object_listing
+        # puts direction_listing # TODO do we want this?
       }
       add(/inventory/i) { |match|
         if inventory.any?
@@ -166,6 +157,14 @@ def invert_direction(direction)
     :west
   when :west
     :east
+  when :northeast
+    :southwest
+  when :northwest
+    :southeast
+  when :southwest
+    :northeast
+  when :southeast
+    :northwest
   else
     direction
   end
