@@ -38,17 +38,7 @@ game = TextAdventure.new do
   The lone and level sands stretch far away.=
   wasteland.objects.push(statue)
 
-  dead_clown = GameObject.new
-  dead_clown.active = false
-  dead_clown.name = 'dead clown'
-  dead_clown.overview = "The clown's corpse lays in the street."
-  dead_clown.description = 'You killed him. He has a bloody wig on.'
-  town.objects.push(dead_clown)
-
   wig = GameObject.new
-  wig.on_action(/take/i) {
-    dead_clown.active = false
-  }
   wig.active = false
   wig.scenery = false
   wig.can_take = true
@@ -79,7 +69,7 @@ game = TextAdventure.new do
   angry_mob_directions_left = [:east, :west, :north, :south]
   angry_mob = GameObject.new
   angry_mob.parser = InputParser.new do |input|
-    add (/(go|move) (.*)/i) { |match|
+    add(/(go|move) (.*)/i) { |match|
      direction = match[2].downcase.to_sym
      angry_mob_directions_left.delete(direction)
      if angry_mob_directions_left.empty?
@@ -96,24 +86,34 @@ game = TextAdventure.new do
   town.objects.push(angry_mob)
 
   clown = GameObject.new
+  clown_is_dead = false
   clown.on_action(/approach/i) {
-    ask_question('This crazy motherfucker named Connor the Clown tries to gut you. Stab that bitch in the face?') {
-      add(/yes/i) {
-        puts 'You kill him.'
-        clown.active = false
-        dead_clown.active = true
-        wig.active = true
-        angry_mob.active = true
+    if clown_is_dead
+      puts "The clown kinda smells."
+    else
+      ask_question('This crazy motherfucker named Connor the Clown tries to gut you. Stab that bitch in the face?') {
+        add(/yes/i) {
+          puts 'You kill him.'
+          clown.overview = "The clown's corpse lays in the street."
+          clown.description = 'You killed him. He has a bloody wig on.'
+          clown_is_dead = true
+          wig.active = true
+          angry_mob.active = true
+        }
+        add(/no/i) {
+          puts 'You are dead.'
+          end_game
+        }
       }
-      add(/no/i) {
-        puts 'You are dead.'
-        end_game
-      }
-    }
+    end
   }
   clown.name = 'clown'
   clown.description = 'a crazy clown, maybe you should approach him'
   town.objects.push(clown)
+
+  wig.on_action(/take/i) {
+    clown.active = false
+  }
 
   # starting node
 
