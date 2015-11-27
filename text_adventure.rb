@@ -63,7 +63,7 @@ class TextAdventure
         if object
           puts object.description
         else
-          puts "What is a #{object}?"
+          puts "You don't see a #{match[2]}?"
         end
       }
       add(/see (.*)/i) { |match|
@@ -71,7 +71,7 @@ class TextAdventure
         if object
           puts load_image(object.name) || "It looks like a #{object.name}"
         else
-          puts "What is a #{object}?"
+          puts "You don't see a #{match[1]}?"
         end
       }
       add(/take (.*)/i) { |match|
@@ -86,7 +86,7 @@ class TextAdventure
             puts "You can't pick up #{object.name}."
           end
         else
-          puts "What is a #{object}?"
+          puts "You don't see a #{match[1]}?"
         end
       }
       # TODO drop object
