@@ -28,7 +28,7 @@ end
 
 def load_image(image_name)
   path = "images/#{image_name}.txt"
-  File.open(path, 'rb') { |f| f.read } if File.exists? path
+  File.read(path) if File.exists? path
 end
 
 def ask_question(question, &block)
@@ -90,6 +90,7 @@ mayor = GameObject.new do |input|
         puts 'You are taken to jail'
         current_node = jail_cell
         print_location_name current_node
+        puts current_node.description
       }
       add(/no/) {
         puts 'The mob guts you like the beast you are.'
