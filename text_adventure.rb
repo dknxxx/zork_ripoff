@@ -35,6 +35,7 @@ class TextAdventure
     @current_node = node
     puts "#======== #{node.name} ========#"
     puts current_node.description
+    puts current_node.overview
   end
 
   def end_game
@@ -91,15 +92,7 @@ class TextAdventure
       }
       # TODO drop object
       add(/look/i) { |match|
-        scenery_objects = current_node.active_objects.select(&:scenery)
-        object_listing = scenery_objects.map(&:overview).join("\n")
-
-        direction_listing = current_node.directions.map { |direction, node|
-          "To the #{direction} you see a #{node.name}"
-        }.join(". ")
-        
-        puts object_listing
-        # puts direction_listing # TODO do we want this?
+        puts current_node.overview
       }
       add(/inventory/i) { |match|
         if inventory.any?

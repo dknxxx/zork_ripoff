@@ -6,6 +6,14 @@ class Node
     @objects = []
   end
 
+  def overview
+    # direction_listing = directions.map { |direction, node|
+    #   "To the #{direction} you see a #{node.name}"
+    # }.join(". ") # TODO do we want this?
+    
+    active_objects.select(&:scenery).map(&:overview).join("\n")
+  end
+
   def active_objects
     @objects.select(&:active)
   end
