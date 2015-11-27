@@ -43,41 +43,39 @@ game = TextAdventure.new do
   dead_clown.description = 'You killed him. He has a bloody wig on'
   town.objects.push(dead_clown)
 
-  wig = GameObject.new do |input|
-    add(/take wig/i) {
-      puts 'You take the wig.'
-      dead_clown.active = false
-      wig.active = false
-      inventory.push(wig.name)
-    }
-  end
+  wig = GameObject.new
+  wig.on_action(/take/i) {
+    dead_clown.active = false
+  }
   wig.active = false
+  wig.scenery = false
+  wig.can_take = true
   wig.name = 'wig'
   wig.description = 'a bloody wig'
   town.objects.push(wig)
 
-  mayor = GameObject.new do |input|
-    add (/(talk|speak) (mayor|Cameron the Salty)/i) {
-      ask_question('''Alas, my brother is dead. A new grain of salt has been added to the pile.
-      You, foreigner, are responsible and must pay the price. Submit?''') {
-        add(/yes/) {
-          puts 'You are taken to jail'
-          move_to jail_cell
-        }
-        add(/no/) {
-          puts 'The mob guts you like the beast you are.'
-          end_game
-        }
+  mayor = GameObject.new
+  mayor.on_action(/(talk|speak|approach) (with|to)/i) {
+    ask_question('''Alas, my brother is dead. A new grain of salt has been added to the pile.
+    You, foreigner, are responsible and must pay the price. Submit?''') {
+      add(/yes/) {
+        puts 'You are taken to jail'
+        move_to jail_cell
+      }
+      add(/no/) {
+        puts 'The mob guts you like the beast you are.'
+        end_game
       }
     }
-  end
+  }
   mayor.active = false
   mayor.name = 'Cameron the Salty'
   mayor.description = 'The saltiest of the salties'
   town.objects.push(mayor)
 
   angry_mob_directions_left = [:east, :west, :north, :south]
-  angry_mob = GameObject.new do |input|
+  angry_mob = GameObject.new
+  angry_mob.parser = InputParser.new do |input|
     add (/(go|move) (.*)/i) { |match|
      direction = match[2].downcase.to_sym
      angry_mob_directions_left.delete(direction)
@@ -94,23 +92,22 @@ game = TextAdventure.new do
   angry_mob.description = 'The angriest of mobs'
   town.objects.push(angry_mob)
 
-  clown = GameObject.new do |input|
-    add (/approach/i) {
-      ask_question('This crazy motherfucker named Connor the Clown tries to gut you. Stab that bitch in the face?') {
-        add(/yes/i) {
-          puts 'You kill him.'
-          clown.active = false
-          dead_clown.active = true
-          angry_mob.active = true
-        }
-        add(/no/i) {
-          puts 'You are dead.'
-          end_game
-        }
+  clown = GameObject.new
+  clown.on_action(/approach/i) {
+    ask_question('This crazy motherfucker named Connor the Clown tries to gut you. Stab that bitch in the face?') {
+      add(/yes/i) {
+        puts 'You kill him.'
+        clown.active = false
+        dead_clown.active = true
+        wig.active = true
+        angry_mob.active = true
+      }
+      add(/no/i) {
+        puts 'You are dead.'
+        end_game
       }
     }
-  end
-
+  }
   clown.name = 'clown'
   clown.description = 'a crazy clown, maybe you should approach him'
   town.objects.push(clown)

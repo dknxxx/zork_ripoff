@@ -1,14 +1,13 @@
 class Node < GameObject
   attr_accessor :directions, :objects
 
-  def initialize(&block)
-    super(&block)
+  def initialize
     @directions = {}
     @objects = []
   end
 
   def active_objects
-    @objects.map(&:active)
+    @objects.select(&:active)
   end
 
   def link(other_node, direction)

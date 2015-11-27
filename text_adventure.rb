@@ -33,7 +33,7 @@ class TextAdventure
 
   def move_to(node)
     @current_node = node
-    puts "#======== #{node.name} ========"
+    puts "#======== #{node.name} ========#"
     puts current_node.description
   end
 
@@ -74,17 +74,33 @@ class TextAdventure
           puts "What is a #{object}?"
         end
       }
+      add(/take (.*)/i) { |match|
+        object = current_node.active_objects.find { |obj| obj.name.downcase == match[1].downcase }
+        if object
+          if object.can_take
+            puts "You pick up #{object.name}."
+            inventory.push(object.name)
+            current_node.objects.delete(object)
+            object.do_action('take')
+          else
+            puts "You can't pick up #{object.name}."
+          end
+        else
+          puts "What is a #{object}?"
+        end
+      }
       add(/look/i) { |match|
-        object_listing = case current_node.active_objects.size
+        scenery_objects = current_node.active_objects.select(&:scenery)
+        object_listing = case scenery_objects.size
         when 0
           "You see nothing. "
         when 1
-          "You see a #{current_node.active_objects.first.name}. "
+          "You see a #{scenery_objects.first.name}. "
         else
-          object_names = (current_node.active_objects[1..-2].map { |object|
+          object_names = (scenery_objects[1..-2].map { |object|
             "a #{object.name}"
-          } + ["and a #{current_node.active_objects[-1].name}"]).join(", ")
-          "You see a #{current_node.active_objects.first.name}, #{object_names}. "
+          } + ["and a #{scenery_objects[-1].name}"]).join(", ")
+          "You see a #{scenery_objects.first.name}, #{object_names}. "
         end
 
         direction_listing = current_node.directions.map { |direction, node|
@@ -101,8 +117,18 @@ class TextAdventure
           puts "In your inventory, you have nothing."
         end
       }
-      add(//) { |match|
-        puts "I do not understand"
+      add(/.*/) { |match|
+        # try to perform an action...
+        object_to_act_on = current_node.active_objects.find { |object|
+          action_match = match[0].match(/(.*) (#{object.name})/i)
+          object.has_action?(action_match[1]) if action_match
+        }
+        if object_to_act_on
+          action = match[0].match(/(.*) (#{object_to_act_on.name})/i)[1]
+          object_to_act_on.do_action(action)
+        else
+          puts "I do not understand"
+        end
       }
     end
 
@@ -112,8 +138,9 @@ class TextAdventure
       input_handled = current_node.process_input(input)
 
       i = 0
-      while not input_handled and i < current_node.active_objects.length do
-        input_handled = current_node.active_objects[i].process_input(input)
+      active_objects = current_node.active_objects
+      while not input_handled and i < active_objects.length do
+        input_handled = active_objects[i].process_input(input)
         i += 1
       end
 

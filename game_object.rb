@@ -1,12 +1,31 @@
 class GameObject
-  attr_accessor :name, :description, :active
+  attr_accessor :parser, :name, :description, :active, :scenery, :can_take
 
-  def initialize(&block)
+  def initialize
+    @actions = {}
     @active = true
-    @input_parser = InputParser.new &block if block
+    @scenery = true
+    @can_take = false
+  end
+
+  def on_action(regex, &block)
+    @actions[regex] = block
+  end
+
+  def do_action(action)
+    regex = @actions.keys.find { |regex|
+      action =~ regex
+    }
+    @actions[regex].call if regex
+  end
+
+  def has_action?(action)
+    @actions.keys.any? { |regex|
+      action =~ regex
+    }
   end
 
   def process_input(input)
-    @input_parser.parse(input) if @input_parser
+    @parser.parse(input) if @parser
   end
 end
