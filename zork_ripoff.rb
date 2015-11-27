@@ -22,7 +22,7 @@ game = TextAdventure.new do
 
   statue = GameObject.new
   statue.name = 'statue'
-  statue.description = %q=Two vast and trunkless legs of stone
+  statue.description = %q=  Two vast and trunkless legs of stone
   Stand in the desert. Near them, on the sand,
   Half sunk, a shattered visage lies, whose frown,
   And wrinkled lip, and sneer of cold command,

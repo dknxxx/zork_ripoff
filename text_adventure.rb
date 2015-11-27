@@ -89,6 +89,7 @@ class TextAdventure
           puts "What is a #{object}?"
         end
       }
+      # TODO drop object
       add(/look/i) { |match|
         scenery_objects = current_node.active_objects.select(&:scenery)
         object_listing = case scenery_objects.size
