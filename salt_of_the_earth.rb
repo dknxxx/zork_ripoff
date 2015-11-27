@@ -75,6 +75,7 @@ game = TextAdventure.new do
      if angry_mob_directions_left.empty?
        puts "The mayor approaches"
        mayor.active = true
+       puts current_node.overview
      else
        puts "The angry mob prevents you from leaving"
       end
@@ -99,6 +100,7 @@ game = TextAdventure.new do
           clown_is_dead = true
           wig.active = true
           angry_mob.active = true
+          puts current_node.overview
         }
         add(/no/i) {
           puts 'You are dead.'
