@@ -4,7 +4,7 @@ game = TextAdventure.new do
   # nodes
 
   wasteland = Node.new
-  wasteland.name = 'wasteland'
+  wasteland.name = 'Wasteland'
   wasteland.description = 'and so it begins'
   
   town = Node.new
@@ -13,6 +13,7 @@ game = TextAdventure.new do
   
   jail_cell = Node.new
   jail_cell.name = 'Your Private Cell'
+  jail_cell.description = 'A dark and dank (not like that you stoners) room that makes you seriously regret your situation.'
 
   # link nodes
 
@@ -116,6 +117,42 @@ game = TextAdventure.new do
   wig.on_action(/take/i) {
     clown.active = false
   }
+
+  window = GameObject.new
+  window.name = 'window'
+  window.overview = 'There is a window to the north of the cell.'
+  window.description = 'A small, cobwebbed opening protected by bars.'
+  jail_cell.objects.push(window)
+
+  bars = GameObject.new
+  bars.scenery = false
+  bars.name = 'bars'
+  bars.description = 'Rusty old bars that look like they can be pushed.'
+  jail_cell.objects.push(bars)
+
+  bars.on_action(/push/i) {
+    ask_question('Are you sure you want to do this?') {
+      add(/yes/i) {
+        puts 'You push the bars with all your strength. After a great deal of struggling, they come loose. Unfortunately, so does the top block of stone, crushing your hands and causing you to bleed out. You died.'
+        end_game
+      }
+      add (/no/i) {
+        puts 'Okay... Well I hope you are comfortable in your cell.'
+      }
+    }
+  }
+
+  door = GameObject.new
+  door.name = 'door'
+  door.overview = 'To the south is the door.' 
+  door.description = 'A solid wood door with a small viewing slot. The lock looks like it can be picked with a stick.'
+  jail_cell.objects.push(door)
+
+  guard = GameObject.new
+  guard.name = 'Guard'
+  guard.overview = 'You can hear a guard murmuring to himself on the other side of the door.'
+  guard.description = 'That guard assigned to you. He has a secret passion for dressing up in wigs.'
+  jail_cell.objects.push(guard)
 
   # starting node
 
